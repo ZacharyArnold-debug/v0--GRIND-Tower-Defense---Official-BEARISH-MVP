@@ -16,6 +16,7 @@ interface WaveRewardDialogProps {
   isBossWave: boolean
 }
 
+// Add special UI for level transitions
 export default function WaveRewardDialog({
   waveNumber,
   isOpen,
@@ -27,6 +28,15 @@ export default function WaveRewardDialog({
   const [showConfetti, setShowConfetti] = useState(false)
   const totalReward = baseReward + bonusReward
   const { playSound } = useSoundEffects()
+
+  // Add state to track if this is a level transition
+  const isLevelTransition = waveNumber === 5 // Level 1 to Level 2 transition
+
+  // Handle reward dialog close
+  const handleDialogClose = () => {
+    // Call the provided onClose function
+    onClose()
+  }
 
   // Trigger confetti effect when dialog opens
   useEffect(() => {
@@ -82,21 +92,29 @@ export default function WaveRewardDialog({
       onOpenChange={(open) => {
         if (!open) {
           // Ensure we call onClose to properly transition to the next wave
-          onClose()
+          handleDialogClose()
         }
       }}
     >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl">
-            {isBossWave ? "Boss Wave Completed! 🎉" : "Wave Completed! 🎉"}
+            {isLevelTransition
+              ? "Level 1 Completed! 🎉"
+              : isBossWave
+                ? "Boss Wave Completed! 🎉"
+                : "Wave Completed! 🎉"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="py-6">
           <div className="text-center mb-6">
             <div className="text-4xl font-bold mb-2">Wave {waveNumber}</div>
-            <p className="text-gray-500">You've successfully defended against the enemy attack!</p>
+            <p className="text-gray-500">
+              {isLevelTransition
+                ? "You've completed Level 1! Get ready for Level 2!"
+                : "You've successfully defended against the enemy attack!"}
+            </p>
           </div>
 
           <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
@@ -129,7 +147,23 @@ export default function WaveRewardDialog({
             </div>
           </div>
 
-          {isBossWave && (
+          {isLevelTransition && (
+            <div className="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-500 p-4 rounded mb-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <Award className="h-5 w-5 text-blue-500" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-blue-700 dark:text-blue-200">
+                    <span className="font-bold">Level 1 completed!</span> Level 2 will use the same path but with new
+                    challenges.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isBossWave && !isLevelTransition && (
             <div className="bg-yellow-100 dark:bg-yellow-900 border-l-4 border-yellow-500 p-4 rounded">
               <div className="flex">
                 <div className="flex-shrink-0">
@@ -146,8 +180,8 @@ export default function WaveRewardDialog({
         </div>
 
         <DialogFooter>
-          <Button onClick={onClose} className="w-full bg-green-600 hover:bg-green-700">
-            Continue to Wave {waveNumber + 1}
+          <Button onClick={handleDialogClose} className="w-full bg-green-600 hover:bg-green-700">
+            {isLevelTransition ? "Start Level 2" : `Continue to Wave ${waveNumber + 1}`}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -59,3 +59,222 @@ body {
     --ring: 142.4 71.8% 29.2%;
   }
 }
+
+/* Add simplified tower button styles */
+.tower-button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 2px solid #333;
+  border-radius: 8px;
+  background-color: #444;
+  color: white;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.tower-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #555;
+}
+
+.tower-button.selected {
+  border-color: #4caf50;
+  background-color: #3e8e41;
+}
+
+.tower-button.owned {
+  border-color: #4caf50;
+}
+
+.tower-preview-container {
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.tower-preview {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #666;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tower-icon {
+  font-size: 20px;
+}
+
+.tower-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  flex-grow: 1;
+}
+
+.tower-name {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.tower-cost {
+  font-size: 12px;
+  color: #4caf50;
+}
+
+/* Tower type specific styles */
+.basic-tower-preview {
+  background-color: #4a90e2;
+}
+
+.sniper-tower-preview {
+  background-color: #e24a4a;
+}
+
+.rapid-tower-preview {
+  background-color: #4ae24a;
+}
+
+.fire-tower-preview {
+  background-color: #ff7700;
+}
+
+.lightning-tower-preview {
+  background-color: #00ccff;
+}
+
+.winter-tower-preview {
+  background-color: #add8e6;
+}
+
+.pons-tower-preview {
+  background-color: #8b5cf6;
+}
+
+.grind_hamster-tower-preview {
+  background-color: #34d399;
+}
+
+.bearish_bear-tower-preview {
+  background-color: #60a5fa;
+}
+
+/* Update the tower styles to ensure proper sizing */
+.tower {
+  position: absolute;
+  width: 64px; /* Changed from 80px to 64px to match grid size */
+  height: 64px; /* Changed from 80px to 64px to match grid size */
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.tower-icon {
+  width: 64px; /* Changed from 80px to 64px */
+  height: 64px; /* Changed from 80px to 64px */
+  margin: 0; /* Changed from 5px to 0 */
+  cursor: pointer;
+  border: 2px solid #333;
+  border-radius: 5px;
+  transition: transform 0.2s;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+.tower-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Enemy styles */
+.enemy {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.boss {
+  width: 60px;
+  height: 60px;
+}
+
+.boss2 {
+  width: 70px;
+  height: 70px;
+}
+
+/* Health bar styles */
+.boss-health-bar {
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background-color: #ff0000;
+}
+
+/* Projectile styles */
+.projectile {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* Tower selector button styles */
+.tower-selector-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100px;
+  height: 80px;
+  padding: 8px;
+  background-color: #2d3748;
+  border: 2px solid #4a5568;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.tower-selector-button:hover {
+  transform: translateY(-2px);
+  border-color: #63b3ed;
+}
+
+.tower-selector-button.selected {
+  border-color: #4299e1;
+  background-color: #2b6cb0;
+}
+
+.tower-selector-preview {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  font-size: 24px;
+  background-color: #4a5568;
+}
+
+.tower-selector-name {
+  font-size: 12px;
+  text-align: center;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}

@@ -1,4 +1,4 @@
-"\"use client"
+"use client"
 
 import { useState } from "react"
 import { useWallet } from "@/components/hooks/useWallet"
@@ -63,25 +63,26 @@ export default function ShopPanel({ ownedTowers, onBuyTower }: ShopPanelProps) {
         </div>
       </div>
 
+      {/* Simplified tower buttons with clear text labels */}
       <div className="space-y-3 flex-grow overflow-auto">
         {TOWER_TYPES.map((tower) => (
-          <div
+          <button
             key={tower.id}
-            className={`bg-gray-700 rounded-lg p-3 cursor-pointer transition-all ${
-              selectedTower?.id === tower.id ? "ring-2 ring-green-400" : ""
-            } ${ownedTowers.includes(tower.id) ? "border border-green-500" : ""}`}
+            className={`tower-button ${tower.id}-tower-button ${
+              selectedTower?.id === tower.id ? "selected" : ""
+            } ${ownedTowers.includes(tower.id) ? "owned" : ""}`}
             onClick={() => setSelectedTower(tower)}
           >
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mr-3 text-xl">
-                {tower.icon}
-              </div>
-              <div>
-                <h3 className="font-medium">{tower.name}</h3>
-                <div className="text-green-400 text-sm">{tower.cost} $GRIND</div>
+            <div className="tower-preview-container">
+              <div className={`tower-preview ${tower.id}-tower-preview`}>
+                <span className="tower-icon">{tower.id === "basic" ? "🏰" : tower.icon}</span>
               </div>
             </div>
-          </div>
+            <div className="tower-info">
+              <span className="tower-name">{tower.name}</span>
+              <span className="tower-cost">{tower.cost} $GRIND</span>
+            </div>
+          </button>
         ))}
       </div>
 

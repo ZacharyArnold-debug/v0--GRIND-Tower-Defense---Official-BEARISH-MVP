@@ -22,14 +22,15 @@ export const TOWER_TYPES: TowerType[] = [
   /* ————————————————————— EXISTING "starter" towers ——————————————————— */
   {
     id: "basic",
-    name: "Basic Tower",
-    description: "Standard defense tower with balanced stats",
-    sprite: "/assets/towers/basic-tower.png",
+    name: "Catapult Tower",
+    description: "Stone tower with wooden catapult for balanced attack power",
+    sprite:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/basic%20tower.jpg-PECSuZARX5Rgu8qVy3B7VWp4enkoCG.jpeg",
     cost: 100,
     damage: 10,
     range: 3,
     fireRate: 1000,
-    icon: "🗼",
+    icon: "🏰",
     projectileColor: "#FFD700",
   },
   {

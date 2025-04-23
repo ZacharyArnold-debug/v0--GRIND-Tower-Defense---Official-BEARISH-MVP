@@ -65,21 +65,26 @@ export const ENEMY_TYPES: Record<string, EnemyType> = {
 
 // Boss enemies
 export const BOSS_TYPES: Record<string, EnemyType> = {
+  // In the BOSS_TYPES object, reduce all health values by 75%
+
+  // For the Level 1 boss (espresso_overlord)
   espresso_overlord: {
     id: "espresso_overlord",
     name: "Espresso Overlord",
     sprite: "/assets/bosses/espresso-overlord.png",
-    health: 100,
+    health: 25, // Reduced from 100 to 25 (75% reduction)
     speed: 0.5,
     damage: 5,
     reward: 100,
     description: "Level 5 Boss - Powerful fire attacks",
   },
+
+  // For the Level 2 boss (mocha_monarch)
   mocha_monarch: {
     id: "mocha_monarch",
     name: "Mocha Monarch",
     sprite: "/assets/bosses/mocha-monarch.png",
-    health: 200,
+    health: 50, // Reduced from 200 to 50 (75% reduction)
     speed: 0.6,
     damage: 7,
     reward: 200,
@@ -89,7 +94,7 @@ export const BOSS_TYPES: Record<string, EnemyType> = {
     id: "cappuccino_colossus",
     name: "Cappuccino Colossus",
     sprite: "/assets/bosses/cappuccino-colossus.png",
-    health: 350,
+    health: 87, // Reduced from 350 to 87 (75% reduction)
     speed: 0.4,
     damage: 10,
     reward: 350,
@@ -99,7 +104,7 @@ export const BOSS_TYPES: Record<string, EnemyType> = {
     id: "latte_leviathan",
     name: "Latte Leviathan",
     sprite: "/assets/bosses/latte-leviathan.png",
-    health: 500,
+    health: 125, // Reduced from 500 to 125 (75% reduction)
     speed: 0.7,
     damage: 15,
     reward: 500,
@@ -109,7 +114,7 @@ export const BOSS_TYPES: Record<string, EnemyType> = {
     id: "drip_dreadnought",
     name: "Drip Dreadnought",
     sprite: "/assets/bosses/drip-dreadnought.png",
-    health: 650,
+    health: 162, // Reduced from 650 to 162 (75% reduction)
     speed: 0.5,
     damage: 18,
     reward: 650,
@@ -119,7 +124,7 @@ export const BOSS_TYPES: Record<string, EnemyType> = {
     id: "bean_behemoth",
     name: "Bean Behemoth",
     sprite: "/assets/bosses/bean-behemoth.png",
-    health: 800,
+    health: 200, // Reduced from 800 to 200 (75% reduction)
     speed: 0.4,
     damage: 22,
     reward: 800,
@@ -129,7 +134,7 @@ export const BOSS_TYPES: Record<string, EnemyType> = {
     id: "frosted_fiend",
     name: "Frosted Fiend",
     sprite: "/assets/bosses/frosted-fiend.png",
-    health: 950,
+    health: 237, // Reduced from 950 to 237 (75% reduction)
     speed: 0.6,
     damage: 25,
     reward: 950,
@@ -139,7 +144,7 @@ export const BOSS_TYPES: Record<string, EnemyType> = {
     id: "plague_percolator",
     name: "Plague Percolator",
     sprite: "/assets/bosses/plague-percolator.png",
-    health: 1100,
+    health: 275, // Reduced from 1100 to 275 (75% reduction)
     speed: 0.5,
     damage: 30,
     reward: 1100,
@@ -149,7 +154,7 @@ export const BOSS_TYPES: Record<string, EnemyType> = {
     id: "grindmaster",
     name: "Grindmaster",
     sprite: "/assets/bosses/grindmaster.png",
-    health: 1300,
+    health: 325, // Reduced from 1300 to 325 (75% reduction)
     speed: 0.6,
     damage: 35,
     reward: 1300,
@@ -159,7 +164,7 @@ export const BOSS_TYPES: Record<string, EnemyType> = {
     id: "grindfather",
     name: "The Grindfather",
     sprite: "/assets/bosses/grindfather.png",
-    health: 1500,
+    health: 375, // Reduced from 1500 to 375 (75% reduction)
     speed: 0.5,
     damage: 40,
     reward: 1500,

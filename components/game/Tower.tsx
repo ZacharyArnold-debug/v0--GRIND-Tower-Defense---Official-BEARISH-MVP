@@ -19,13 +19,14 @@ interface TowerProps {
   level?: number
 }
 
+// Update the Tower component to ensure proper rendering
 export const Tower: React.FC<TowerProps> = ({
   x,
   y,
   enemies,
   towerType = "basic",
   fireRateMs = 1000,
-  size = 32,
+  size = 64, // Changed from 80 to 64 to match grid size
   level = 1,
 }) => {
   const [cooldown, setCooldown] = useState(0)
@@ -124,10 +125,13 @@ export const Tower: React.FC<TowerProps> = ({
     transform: level > 1 ? `scale(${1 + (level - 1) * 0.1})` : "none",
     filter: level > 1 ? `brightness(${1 + (level - 1) * 0.15})` : "none",
     zIndex: 10 + level,
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center",
   }
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full tower">
       {/* Level indicator */}
       {level > 1 && (
         <div className="absolute -top-3 -right-3 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center text-xs font-bold z-20">
@@ -138,7 +142,7 @@ export const Tower: React.FC<TowerProps> = ({
       {/* Tower sprite */}
       {loaded ? (
         isAnimatedTower(towerType) ? (
-          <div style={levelStyles}>
+          <div style={levelStyles} className="w-full h-full">
             <AnimatedTower type={towerType} size={size} isAttacking={isAttacking} />
           </div>
         ) : (

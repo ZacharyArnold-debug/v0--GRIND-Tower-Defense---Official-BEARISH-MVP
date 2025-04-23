@@ -121,15 +121,19 @@ export class WaveController {
     // If wave is not active, don't proceed
     if (!this.isWaveActive) return
 
-    // If no more enemies active and spawn queue is empty, wave is complete
+    // If no more enemies active and spawn queue is empty, check for boss or complete wave
     if (this.activeEnemies.length === 0 && this.spawnQueue.length === 0) {
       const waveConfig = this.currentWaveConfig!
 
       // If this level has a boss and we haven't spawned it yet, spawn it now
       if (waveConfig.hasBoss && waveConfig.bossType && !this.bossSpawned) {
-        console.log(`Spawning boss for level ${this.currentLevel}: ${waveConfig.bossType}`)
-        this.spawnBoss(waveConfig.bossType)
-        this.bossSpawned = true
+        console.log(`Preparing to spawn boss for level ${this.currentLevel}: ${waveConfig.bossType}`)
+
+        // Add a small delay before spawning the boss to prevent freeze issues
+        setTimeout(() => {
+          this.spawnBoss(waveConfig.bossType!)
+        }, 500)
+
         return
       }
 
@@ -150,6 +154,8 @@ export class WaveController {
   }
 
   private spawnBoss(bossType: string): void {
+    console.log(`Attempting to spawn boss: ${bossType}`)
+
     if (this.path.length === 0) {
       console.error("Cannot spawn boss: path is empty")
       return
@@ -163,21 +169,31 @@ export class WaveController {
       return
     }
 
-    const boss: SpawnedEnemy = {
-      id: this.nextEnemyId++,
-      x: startPoint.x,
-      y: startPoint.y,
-      health: bossData.health,
-      maxHealth: bossData.health,
-      enemyType: bossType,
-      pathIndex: 0,
-      speed: bossData.speed,
-      damage: bossData.damage,
-      reward: bossData.reward,
-    }
+    try {
+      console.log(`Spawning boss: ${bossType} at level ${this.currentLevel}`)
 
-    this.activeEnemies.push(boss)
-    this.onEnemySpawned(boss)
+      // Create the boss with appropriate health scaling based on level
+      // Use the updated health values from EnemyTypes.ts
+      const boss: SpawnedEnemy = {
+        id: this.nextEnemyId++,
+        x: startPoint.x,
+        y: startPoint.y,
+        health: bossData.health, // Use the updated health values
+        maxHealth: bossData.health, // Use the updated health values
+        enemyType: bossType,
+        pathIndex: 0,
+        speed: bossData.speed,
+        damage: bossData.damage,
+        reward: bossData.reward,
+      }
+
+      this.activeEnemies.push(boss)
+      this.onEnemySpawned(boss)
+      this.bossSpawned = true
+      console.log(`Boss spawned successfully with ${boss.health} health`)
+    } catch (error) {
+      console.error("Error spawning boss:", error)
+    }
   }
 
   private processSpawnQueue(): void {
@@ -249,7 +265,7 @@ export class WaveController {
 
   private generateWaveConfig(level: number): WaveConfig {
     // Determine which enemy types are available for this level
-    const availableEnemyTypes: string[] = ["coffee_cup"]
+    let availableEnemyTypes: string[] = ["coffee_cup"]
 
     if (level >= 3) availableEnemyTypes.push("iced_coffee")
     if (level >= 5) availableEnemyTypes.push("coffee_bag")
@@ -258,19 +274,26 @@ export class WaveController {
 
     // Determine boss type based on level
     let bossType: string | undefined
-    const hasBoss = level % 5 === 0
+    const hasBoss = level % 5 === 0 || level === 1 || level === 2 // Add special bosses for levels 1 and 2
 
     if (hasBoss) {
-      if (level <= 10) bossType = "espresso_overlord"
-      else if (level <= 20) bossType = "mocha_monarch"
-      else if (level <= 30) bossType = "cappuccino_colossus"
-      else if (level <= 40) bossType = "latte_leviathan"
-      else if (level <= 50) bossType = "drip_dreadnought"
-      else bossType = "grindfather"
+      if (level === 1) bossType = "espresso_overlord"
+      else if (level === 2) bossType = "mocha_monarch"
+      else if (level <= 10) bossType = "cappuccino_colossus"
+      else if (level <= 20) bossType = "latte_leviathan"
+      else if (level <= 30) bossType = "drip_dreadnought"
+      else if (level <= 40) bossType = "bean_behemoth"
+      else if (level <= 50) bossType = "grindfather"
     }
 
     // Calculate number of enemies based on level
-    const regularEnemyCount = Math.min(20, 4 + Math.floor(level / 2))
+    let regularEnemyCount = Math.min(20, 4 + Math.floor(level / 2))
+
+    // Level 2 should be the same as level 1
+    if (level === 2) {
+      regularEnemyCount = 4
+      availableEnemyTypes = ["coffee_cup"]
+    }
 
     // Calculate rewards
     const baseReward = level * 50
@@ -292,16 +315,29 @@ export class WaveController {
   }
 
   public clearSpawnQueue(): void {
+    console.log(`Clearing spawn queue: ${this.spawnQueue.length} enemies in queue`)
+
+    // Clear the queue
     this.spawnQueue = []
+
+    // Clear any pending spawn timer
     if (this.spawnTimer) {
       clearTimeout(this.spawnTimer)
       this.spawnTimer = null
+      console.log("Spawn timer cleared")
     }
   }
 
   public reset(): void {
+    console.log("Resetting wave controller state")
+
+    // Mark wave as inactive first to prevent any callbacks
     this.isWaveActive = false
+
+    // Clear spawn queue and timer
     this.clearSpawnQueue()
+
+    // Reset all enemy tracking
     this.activeEnemies = []
     this.nextEnemyId = 0
     this.enemiesDefeated = 0
@@ -309,6 +345,8 @@ export class WaveController {
     this.bossSpawned = false
     this.totalEnemiesInWave = 0
     this.currentWaveConfig = null
+
+    console.log("Wave controller reset complete")
   }
 
   public setPath(path: PathPoint[]): void {

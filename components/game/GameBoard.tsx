@@ -1,12 +1,14 @@
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
+import type React from "react"
+
 import GridTile, { type PathPoint } from "./GridTile"
 import Enemy from "./Enemy"
 import Projectile from "./Projectile"
 import { Tower } from "./Tower"
 import { WaveController, type SpawnedEnemy, type WaveConfig } from "./WaveController"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Trash2 } from "lucide-react"
 import { toast } from "react-hot-toast"
 import Castle from "./Castle"
 import { CASTLE_TYPES } from "./TowerTypes"
@@ -15,6 +17,7 @@ import WaveSystem from "./WaveSystem"
 import WaveRewardDialog from "./WaveRewardDialog"
 import { useWallet } from "@/components/hooks/useWallet"
 import { playSound } from "@/utils/sound"
+import { TOWER_TYPES } from "./TowerTypes"
 
 // Types
 interface ProjectileType {
@@ -46,7 +49,7 @@ export default function GameBoard({
   onWaveChange,
 }: GameBoardProps) {
   const [pathPoints, setPathPoints] = useState<PathPoint[]>([])
-  const [towerPoints, setTowerPoints] = useState<Array<PathPoint & { type?: string }>>([])
+  const [towerPoints, setTowerPoints] = useState<Array<PathPoint & { type?: string; cost?: number }>>([])
   const [selectedTowerType, setSelectedTowerType] = useState<string>("basic")
   const [editMode, setEditMode] = useState(true) // Start in edit mode
   const [running, setRunning] = useState(false)
@@ -64,9 +67,48 @@ export default function GameBoard({
   const [enemiesRemaining, setEnemiesRemaining] = useState(0)
   const [totalEnemiesInWave, setTotalEnemiesInWave] = useState(0)
   const { balance, setBalance } = useWallet()
+  const gameCanvasRef = useRef<HTMLDivElement>(null)
 
   // Reference to store the wave controller
   const waveControllerRef = useRef<WaveController | null>(null)
+
+  // Handle tower removal with right-click
+  const handleTowerRemoval = useCallback(
+    (e: React.MouseEvent) => {
+      if (isWaveActive) return // Don't allow tower removal during active waves
+
+      e.preventDefault() // Prevent context menu
+
+      if (!gameCanvasRef.current) return
+
+      const rect = gameCanvasRef.current.getBoundingClientRect()
+      const x = Math.floor((e.clientX - rect.left) / tileSize)
+      const y = Math.floor((e.clientY - rect.top) / tileSize)
+
+      // Find tower at this position
+      const towerIndex = towerPoints.findIndex((tower) => tower.x === x && tower.y === y)
+
+      if (towerIndex !== -1) {
+        const tower = towerPoints[towerIndex]
+
+        // Calculate refund (50% of tower cost)
+        const refundAmount = tower.cost ? Math.floor(tower.cost * 0.5) : 50
+
+        // Remove tower
+        setTowerPoints((prev) => prev.filter((_, index) => index !== towerIndex))
+
+        // Refund gold
+        setBalance((prev) => prev + refundAmount)
+
+        // Play sound and show notification
+        playSound("TOWER_PLACE")
+        toast.success(`Tower removed! Refunded ${refundAmount} gold.`)
+
+        console.log("Tower removed, gold refunded")
+      }
+    },
+    [towerPoints, isWaveActive, tileSize, setBalance],
+  )
 
   // Initialize wave controller with empty path (will be updated later)
   useEffect(() => {
@@ -125,7 +167,7 @@ export default function GameBoard({
         waveControllerRef.current.reset()
       }
     }
-  }, [onWaveChange])
+  }, [onWaveChange, pathPoints])
 
   // Update the path in the wave controller when pathPoints changes
   useEffect(() => {
@@ -184,6 +226,96 @@ export default function GameBoard({
     }
   }
 
+  // Clear game state for level transitions
+  const clearGameState = useCallback(() => {
+    console.log("Starting game state cleanup...")
+
+    // Cancel any existing animations or timers
+    if (waveControllerRef.current) {
+      console.log("Clearing wave controller spawn queue and resetting state")
+      waveControllerRef.current.clearSpawnQueue()
+      waveControllerRef.current.reset()
+    }
+
+    // Clear enemies with proper cleanup
+    console.log(`Clearing ${enemies.length} enemies`)
+    setEnemies([])
+
+    // Clear projectiles with proper cleanup
+    console.log(`Clearing ${projectiles.length} projectiles`)
+    setProjectiles([])
+
+    // Reset game variables but keep towers
+    setScore(0)
+
+    // Remove all event listeners and re-add them to prevent memory leaks
+    const gameCanvas = gameCanvasRef.current
+    if (gameCanvas) {
+      console.log("Refreshing event listeners")
+      gameCanvas.removeEventListener("contextmenu", handleTowerRemoval as any)
+      gameCanvas.addEventListener("contextmenu", handleTowerRemoval as any)
+    }
+
+    console.log("Game state cleared successfully")
+  }, [handleTowerRemoval, enemies, projectiles])
+
+  // Improve the startLevel2 function to properly initialize level 2
+  const startLevel2 = useCallback(() => {
+    console.log("Initializing Level 2...")
+
+    try {
+      // Clear existing game state with improved cleanup
+      clearGameState()
+
+      // Initialize level 2 specific settings
+      setWaveNumber(1) // Reset to wave 1 for the new level
+      console.log("Wave number reset to 1 for Level 2")
+
+      // Set up new game state with proper initialization
+      setBalance(500) // Reset gold/balance
+      setCastleHealth(100) // Reset castle health
+      console.log("Game resources reset: gold=500, castle health=100")
+
+      // Reset tower points but keep the types
+      setTowerPoints([])
+      console.log("Tower points reset")
+
+      // Important: Keep the same path from Level 1
+      // No need to modify pathPoints here, as we want to keep the same path
+
+      // Make sure the wave controller has the latest path
+      if (waveControllerRef.current && pathPoints.length > 0) {
+        console.log(`Updating path in wave controller: ${pathPoints.length} points`)
+        waveControllerRef.current.setPath([...pathPoints])
+      } else {
+        console.warn("Path is empty or wave controller not initialized")
+      }
+
+      // Reset wave controller state with error handling
+      if (waveControllerRef.current) {
+        waveControllerRef.current.reset()
+      } else {
+        console.error("Wave controller not initialized for Level 2")
+        toast.error("Error initializing Level 2. Please refresh the page.")
+        return
+      }
+
+      // Reset game state flags
+      setIsWaveActive(false)
+      setRunning(false)
+
+      // Add a delay before starting Level 2 to ensure clean transition
+      setTimeout(() => {
+        // Update UI elements
+        toast.success("Level 2 started! Using the same path as Level 1.")
+        console.log("Level 2 started successfully")
+      }, 300)
+    } catch (error) {
+      console.error("Error starting Level 2:", error)
+      toast.error("Failed to start Level 2. Please refresh the page.")
+    }
+  }, [clearGameState, pathPoints, setBalance])
+
   const placeCastleAtPathEnd = () => {
     if (pathPoints.length > 0) {
       // Get the last point in the path
@@ -214,47 +346,49 @@ export default function GameBoard({
 
   // Enemy movement system
   useEffect(() => {
-    if (!running || pathPoints.length < 2) return
+    let moveInterval: NodeJS.Timeout
 
-    const moveInterval = setInterval(() => {
-      setEnemies((prevEnemies) => {
-        return prevEnemies
-          .map((enemy) => {
-            // Get current path index
-            const currentIndex = enemy.pathIndex
+    if (running && pathPoints.length >= 2) {
+      moveInterval = setInterval(() => {
+        setEnemies((prevEnemies) => {
+          return prevEnemies
+            .map((enemy) => {
+              // Get current path index
+              const currentIndex = enemy.pathIndex
 
-            // If at the end of the path, damage castle and remove enemy
-            if (currentIndex >= pathPoints.length - 1) {
-              // Calculate damage based on enemy type
-              const damage = enemy.damage || (enemy.enemyType.includes("boss") ? 5 : 1)
-              setCastleHealth((prev) => Math.max(0, prev - damage))
+              // If at the end of the path, damage castle and remove enemy
+              if (currentIndex >= pathPoints.length - 1) {
+                // Calculate damage based on enemy type
+                const damage = enemy.damage || (enemy.enemyType.includes("boss") ? 5 : 1)
+                setCastleHealth((prev) => Math.max(0, prev - damage))
 
-              // Notify wave controller that enemy reached the end
-              if (waveControllerRef.current) {
-                waveControllerRef.current.enemyReachedEnd(enemy.id)
+                // Notify wave controller that enemy reached the end
+                if (waveControllerRef.current) {
+                  waveControllerRef.current.enemyReachedEnd(enemy.id)
+                }
+
+                return null
               }
 
-              return null
-            }
+              // Move to the next point in the path
+              const nextIndex = currentIndex + 1
+              const nextPoint = pathPoints[nextIndex]
 
-            // Move to the next point in the path
-            const nextIndex = currentIndex + 1
-            const nextPoint = pathPoints[nextIndex]
+              // Calculate speed factor - different enemies move at different speeds
+              const speedFactor = enemy.speed || 1
 
-            // Calculate speed factor - different enemies move at different speeds
-            const speedFactor = enemy.speed || 1
-
-            // Return updated enemy with new position and incremented path index
-            return {
-              ...enemy,
-              x: nextPoint.x,
-              y: nextPoint.y,
-              pathIndex: nextIndex,
-            }
-          })
-          .filter(Boolean) as SpawnedEnemy[]
-      })
-    }, 500) // Base movement speed - can be adjusted by enemy speed factor
+              // Return updated enemy with new position and incremented path index
+              return {
+                ...enemy,
+                x: nextPoint.x,
+                y: nextPoint.y,
+                pathIndex: nextIndex,
+              }
+            })
+            .filter(Boolean) as SpawnedEnemy[]
+        })
+      }, 500) // Base movement speed - can be adjusted by enemy speed factor
+    }
 
     return () => clearInterval(moveInterval)
   }, [running, pathPoints])
@@ -355,14 +489,52 @@ export default function GameBoard({
 
       const exists = towerPoints.some((t) => t.x === x && t.y === y)
       if (!exists) {
+        // Get tower cost based on type
+        const towerCost = getTowerCost(selectedTowerType)
+
+        // Check if player has enough gold
+        if (balance < towerCost) {
+          toast.error(`Not enough gold! You need ${towerCost} gold.`)
+          return
+        }
+
+        // Deduct gold
+        setBalance((prev) => prev - towerCost)
+
         // Play tower placement sound
         playSound("TOWER_PLACE")
-        // Add a new tower with the currently selected tower type
-        setTowerPoints([...towerPoints, { x, y, type: selectedTowerType }])
-      } else {
-        // Remove tower if clicked on existing tower
-        setTowerPoints(towerPoints.filter((t) => t.x !== x || t.y !== y))
+
+        // Add a new tower with the currently selected tower type and its cost
+        setTowerPoints([...towerPoints, { x, y, type: selectedTowerType, cost: towerCost }])
+
+        toast.success(`${selectedTowerType.charAt(0).toUpperCase() + selectedTowerType.slice(1)} tower placed!`)
       }
+    }
+  }
+
+  // Helper function to get tower cost based on type
+  function getTowerCost(towerType: string): number {
+    switch (towerType) {
+      case "basic":
+        return 100
+      case "sniper":
+        return 250
+      case "rapid":
+        return 200
+      case "fire":
+        return 350
+      case "lightning":
+        return 400
+      case "winter":
+        return 375
+      case "pons":
+        return 500
+      case "grind_hamster":
+        return 400
+      case "bearish_bear":
+        return 450
+      default:
+        return 100
     }
   }
 
@@ -383,6 +555,18 @@ export default function GameBoard({
     }
   }, [castleHealth, running, score, waveNumber])
 
+  // Add right-click event listener for tower removal
+  useEffect(() => {
+    const gameCanvas = gameCanvasRef.current
+    if (!gameCanvas) return
+
+    gameCanvas.addEventListener("contextmenu", handleTowerRemoval as any)
+
+    return () => {
+      gameCanvas.removeEventListener("contextmenu", handleTowerRemoval as any)
+    }
+  }, [handleTowerRemoval])
+
   const isPath = (x: number, y: number) => pathPoints.some((p) => p.x === x && p.y === y)
   const isTower = (x: number, y: number) => towerPoints.some((t) => t.x === x && t.y === y)
   const isCastle = (x: number, y: number) => castlePosition !== null && castlePosition.x === x && castlePosition.y === y
@@ -395,15 +579,31 @@ export default function GameBoard({
   const handleRewardDialogClose = () => {
     setShowRewardDialog(false)
 
-    // Ensure we're ready for the next wave
-    if (waveControllerRef.current) {
-      // Make sure the controller is updated with the latest path
-      waveControllerRef.current.setPath([...pathPoints])
+    // Check if we need to transition to Level 2
+    if (waveNumber === 6) {
+      toast.success("Level 1 completed! Starting Level 2...")
+
+      // Add a small delay before starting Level 2 to ensure clean transition
+      setTimeout(() => {
+        startLevel2()
+      }, 500)
+    } else {
+      // Ensure we're ready for the next wave
+      if (waveControllerRef.current) {
+        try {
+          // Make sure the controller is updated with the latest path
+          waveControllerRef.current.setPath([...pathPoints])
+          console.log("Path updated for next wave")
+        } catch (error) {
+          console.error("Error updating path for next wave:", error)
+          toast.error("Error preparing next wave. Please refresh the page.")
+        }
+      }
     }
   }
 
   // Check if current wave is a boss wave
-  const isBossWave = waveNumber % 5 === 0
+  const isBossWave = waveNumber % 5 === 0 || waveNumber === 1 || waveNumber === 2
 
   return (
     <div className="flex flex-col space-y-4">
@@ -462,22 +662,27 @@ export default function GameBoard({
 
       {/* Tower type selector */}
       {!editMode && !isWaveActive && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3 mb-4">
           {ownedTowers.map((towerId) => (
-            <Button
+            <button
               key={towerId}
               onClick={() => setSelectedTowerType(towerId)}
-              variant={selectedTowerType === towerId ? "default" : "outline"}
-              className={selectedTowerType === towerId ? "bg-blue-600 hover:bg-blue-700" : ""}
+              className={`tower-selector-button ${selectedTowerType === towerId ? "selected" : ""}`}
             >
-              {towerId.charAt(0).toUpperCase() + towerId.slice(1)} Tower
-            </Button>
+              <div className={`tower-selector-preview ${towerId}-tower-preview`}>
+                {TOWER_TYPES.find((t) => t.id === towerId)?.icon || "🗼"}
+              </div>
+              <span className="tower-selector-name">
+                {towerId.charAt(0).toUpperCase() + towerId.slice(1).replace("_", " ")}
+              </span>
+            </button>
           ))}
         </div>
       )}
 
       {/* Game board with map background */}
       <div
+        ref={gameCanvasRef}
         className="relative border-2 border-gray-800 overflow-hidden"
         style={{
           width: `${cols * tileSize}px`,
@@ -571,12 +776,12 @@ export default function GameBoard({
         {towerPoints.map((t, i) => (
           <div
             key={i}
-            className="absolute"
+            className="absolute tower"
             style={{
               left: `${t.x * tileSize}px`,
               top: `${t.y * tileSize}px`,
-              width: `${tileSize}px`,
-              height: `${tileSize}px`,
+              width: `${tileSize}px`, // Ensure width matches tileSize
+              height: `${tileSize}px`, // Ensure height matches tileSize
             }}
           >
             {/* Range indicator */}
@@ -595,7 +800,7 @@ export default function GameBoard({
                 />
               )
             })()}
-            <Tower x={t.x} y={t.y} enemies={enemies} towerType={t.type || "basic"} />
+            <Tower x={t.x} y={t.y} enemies={enemies} towerType={t.type || "basic"} size={tileSize} />
           </div>
         ))}
         {castlePosition && (
@@ -633,9 +838,16 @@ export default function GameBoard({
             {isBossWave && " A boss will appear after defeating all regular enemies!"}
           </p>
         ) : (
-          <p>
-            Select a tower type and click on non-path tiles to place towers. Click "Start Wave {waveNumber}" when ready.
-          </p>
+          <div>
+            <p>
+              Select a tower type and click on non-path tiles to place towers. Click "Start Wave {waveNumber}" when
+              ready.
+            </p>
+            <p className="mt-2 text-red-500">
+              <Trash2 className="inline-block mr-1" size={14} />
+              Right-click on a tower to remove it and get a 50% gold refund.
+            </p>
+          </div>
         )}
       </div>
 
