@@ -1,0 +1,37 @@
+[
+  {
+    "id": "desert",
+    "name": "Desert Ruins",
+    "thumbnail": "/maps/desert-thumb.png",
+    "image": "/maps/desert-bg.png",
+    "tileSize": 64,
+    "width": 12,
+    "height": 10
+  },
+  {
+    "id": "forest",
+    "name": "Forest Glade",
+    "thumbnail": "/maps/forest-thumb.png",
+    "image": "/maps/forest-bg.png",
+    "tileSize": 64,
+    "width": 12,
+    "height": 10
+  },
+  {
+    "id": "winter-wonderland",
+    "name": "Winter Wonderland",
+    "thumbnail": "/assets/maps/winter-wonderland-thumb.png",
+    "image": "/assets/maps/winter-wonderland-bg.png",
+    "tileSize": 64,
+    "width": 12,
+    "height": 10,
+    "path": [
+      { "x": 0, "y": 5 },
+      { "x": 3, "y": 5 },
+      { "x": 3, "y": 2 },
+      { "x": 8, "y": 2 },
+      { "x": 8, "y": 7 },
+      { "x": 11, "y": 7 }
+    ]
+  }
+]

@@ -1,0 +1,146 @@
+[
+  {
+    "name": "coffee-cup-baddie",
+    "src": "/assets/enemies/coffee-cup-baddie.png"
+  },
+  {
+    "name": "iced-coffee-baddie",
+    "src": "/assets/enemies/iced-coffee-baddie.png"
+  },
+  {
+    "name": "coffee-bag-baddie",
+    "src": "/assets/enemies/coffee-bag-baddie.png"
+  },
+  {
+    "name": "flying-french-press",
+    "src": "/assets/enemies/flying-french-press.png"
+  },
+  {
+    "name": "fire-baddie",
+    "src": "/assets/enemies/fire-baddie.png"
+  },
+  {
+    "name": "espresso-overlord",
+    "src": "/assets/bosses/espresso-overlord.png"
+  },
+  {
+    "name": "mocha-monarch",
+    "src": "/assets/bosses/mocha-monarch.png"
+  },
+  {
+    "name": "cappuccino-colossus",
+    "src": "/assets/bosses/cappuccino-colossus.png"
+  },
+  {
+    "name": "latte-leviathan",
+    "src": "/assets/bosses/latte-leviathan.png"
+  },
+  {
+    "name": "drip-dreadnought",
+    "src": "/assets/bosses/drip-dreadnought.png"
+  },
+  {
+    "name": "bean-behemoth",
+    "src": "/assets/bosses/bean-behemoth.png"
+  },
+  {
+    "name": "frosted-fiend",
+    "src": "/assets/bosses/frosted-fiend.png"
+  },
+  {
+    "name": "plague-percolator",
+    "src": "/assets/bosses/plague-percolator.png"
+  },
+  {
+    "name": "grindmaster",
+    "src": "/assets/bosses/grindmaster.png"
+  },
+  {
+    "name": "grindfather",
+    "src": "/assets/bosses/grindfather.png"
+  },
+  {
+    "name": "basic-tower",
+    "src": "/assets/towers/basic-tower.png"
+  },
+  {
+    "name": "sniper-tower",
+    "src": "/assets/towers/sniper-tower.png"
+  },
+  {
+    "name": "rapid-tower",
+    "src": "/assets/towers/rapid-tower.png"
+  },
+  {
+    "name": "splash-tower",
+    "src": "/assets/towers/splash-tower.png"
+  },
+  {
+    "name": "fire-tower",
+    "src": "/assets/towers/fire-tower.png"
+  },
+  {
+    "name": "winter-tower",
+    "src": "/assets/towers/winter-tower.png"
+  },
+  {
+    "name": "lightning-tower",
+    "src": "/assets/towers/lightning-tower.png"
+  },
+  {
+    "name": "pons-tower-frame1",
+    "src": "/assets/towers/pons-tower/frame1.png"
+  },
+  {
+    "name": "pons-tower-frame2",
+    "src": "/assets/towers/pons-tower/frame2.png"
+  },
+  {
+    "name": "pons-tower-frame3",
+    "src": "/assets/towers/pons-tower/frame3.png"
+  },
+  {
+    "name": "grind_hamster-tower-frame1",
+    "src": "/assets/towers/grind_hamster-tower/frame1.png"
+  },
+  {
+    "name": "grind_hamster-tower-frame2",
+    "src": "/assets/towers/grind_hamster-tower/frame2.png"
+  },
+  {
+    "name": "grind_hamster-tower-frame3",
+    "src": "/assets/towers/grind_hamster-tower/frame3.png"
+  },
+  {
+    "name": "bearish_bear-tower-frame1",
+    "src": "/assets/towers/bearish_bear-tower/frame1.png"
+  },
+  {
+    "name": "bearish_bear-tower-frame2",
+    "src": "/assets/towers/bearish_bear-tower/frame2.png"
+  },
+  {
+    "name": "bearish_bear-tower-frame3",
+    "src": "/assets/towers/bearish_bear-tower/frame3.png"
+  },
+  {
+    "name": "tree-castle",
+    "src": "/assets/castles/tree-castle.png"
+  },
+  {
+    "name": "fire-projectile",
+    "src": "/assets/projectiles/fire-projectile.png"
+  },
+  {
+    "name": "ice-projectile",
+    "src": "/assets/projectiles/ice-projectile.png"
+  },
+  {
+    "name": "lightning-projectile",
+    "src": "/assets/projectiles/lightning-projectile.png"
+  },
+  {
+    "name": "explosion-effect",
+    "src": "/assets/effects/explosion-effect.png"
+  }
+]
